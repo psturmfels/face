@@ -6,16 +6,16 @@
     },
     "DATA": {
         "TRAIN": {
-            "IMAGES": "../data/train_images.npy",
-            "LABELS": "../data/train_labels.npy"
+            "IMAGES": "../data/train/cropped",
+            "LABELS": "../data/train/labels.txt"
         },
         "VALIDATION": {
-            "IMAGES": "../data/val_images.npy",
-            "LABELS": "../data/val_labels.npy"
+            "IMAGES": "../data/validation/cropped",
+            "LABELS": "../data/validation/labels.txt"
         },
         "TEST": {
-            "IMAGES": "../data/test_images.npy",
-            "LABELS": "../data/test_labels.npy"
+            "IMAGES": "../data/test/cropped",
+            "LABELS": "../data/test/labels.txt"
         }
     },
     "TRAIN": {
