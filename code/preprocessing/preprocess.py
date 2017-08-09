@@ -77,4 +77,4 @@ def showImage(image):
     plt.show()
 
 if __name__ == '__main__':
-    transferImagesFormat()
+    print("Nothing to do here!")

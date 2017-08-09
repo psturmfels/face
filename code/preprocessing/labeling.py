@@ -2,6 +2,7 @@ import numpy as np
 
 from preprocessing import preprocess
 from preprocessing import augmentation
+from data_scripts.DataSet import DataSet
 
 def writeBlankLabels(outFile='../data/train/labels.txt', imageDir='../data/train/cropped', imageExtension='.png'):
     images, names = preprocess.getAllImagesInDirectory(dir=imageDir, imageExtension=imageExtension)
@@ -31,7 +32,7 @@ def getImagesAndLabels(labelsFile='../data/train/labels.txt', imageDir='../data/
 
     return (images, names, np.array(labels))
 
-def getAugmentedDataSet(labelsFile='../data/train/labels.txt', imageDir='../data/train/cropped', imageExtension='.png'):
+def getAugmentedData(labelsFile='../data/train/labels.txt', imageDir='../data/train/cropped', imageExtension='.png'):
     images, names, labels = getImagesAndLabels(labelsFile, imageDir, imageExtension)
     noFaceIndices = labels == 0
     noFaceImages = images[noFaceIndices]
@@ -65,5 +66,15 @@ def getAugmentedDataSet(labelsFile='../data/train/labels.txt', imageDir='../data
 
     return (noFaceImagesDownsampled, noFaceLabels, faceImagesDownsampled, augmentedFaceLabels)
 
+def getAugmentedDataSet(labelsFile='../data/train/labels.txt', imageDir='../data/train/cropped', imageExtension='.png', oneHot=True):
+    (noFaceImagesDownsampled, noFaceLabels, faceImagesDownsampled, augmentedFaceLabels) = getAugmentedData(labelsFile=labelsFile, imageDir=imageDir, imageExtension=imageExtension)
+
+    images = np.append(noFaceImagesDownsampled, faceImagesDownsampled, axis=0)
+    labels = np.append(noFaceLabels, augmentedFaceLabels, axis=0)
+    dataset = DataSet(images=images, labels=labels, oneHot=oneHot)
+
+    return dataset
+
+
 if __name__ == '__main__':
-    getAugmentedDataSet()
+    print("Nothing to be done here!")
