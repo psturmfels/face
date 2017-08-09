@@ -36,3 +36,7 @@ def train_cnn(input_layer, prediction_layer, loss_func, optimizer, trainingSet, 
                 feed_dict={input_layer: batch_images, true_labels: batch_labels})
     except KeyboardInterrupt:
         print('OK, I will stop training even though I am not finished.')
+
+if __name__ == '__main__':
+    trainingSet = getAugmentedDataSet(labelsFile='../data/train/labels.txt', imageDir='../data/train/cropped', imageExtension='.png', oneHot=True)
+    
