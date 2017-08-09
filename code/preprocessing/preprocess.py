@@ -11,10 +11,10 @@ def saveImage(name, image):
 def getImage(fromPath):
     return ndimage.imread(fromPath)
 
-def getImageNamesInDirectory(dir='../data/raw', imageExtension=".jpg"):
+def getImageNamesInDirectory(dir='../data/train/raw', imageExtension=".jpg"):
     return [image for image in listdir(dir) if image.endswith(imageExtension)]
 
-def getAllImagesInDirectory(dir='../data/raw', imageExtension=".jpg"):
+def getAllImagesInDirectory(dir='../data/train/raw', imageExtension=".jpg"):
     imageNames = getImageNamesInDirectory(dir, imageExtension)
     return (np.array([getImage(dir + '/' + imageName) for imageName in imageNames]), imageNames)
 
@@ -57,13 +57,13 @@ def cropAndReplicateImagesToMinimumDimension(images, names, imageExtension='.jpg
 
     return (np.array(croppedImages), croppedNames)
 
-def cropImagesFromDirectory(dir='../data/raw', imageExtension='.jpg', outDir='../data/cropped'):
+def cropImagesFromDirectory(dir='../data/train/raw', imageExtension='.jpg', outDir='../data/train/cropped'):
     images, names = getAllImagesInDirectory(dir=dir, imageExtension=imageExtension)
     croppedImages, croppedNames = cropAndReplicateImagesToMinimumDimension(images, names, imageExtension)
     for index in range(len(croppedImages)):
         saveImage(outDir + '/' + croppedNames[index], croppedImages[index])
 
-def transferImagesFormat(dir='../data/croppedjpg', informat='.jpg', outdir='../data/cropped', outformat='.png'):
+def transferImagesFormat(dir='../data/train/croppedjpg', informat='.jpg', outdir='../data/train/cropped', outformat='.png'):
     images, names = getAllImagesInDirectory(dir=dir, imageExtension=informat)
     for index in range(len(images)):
         name = names[index].split('.')[0]

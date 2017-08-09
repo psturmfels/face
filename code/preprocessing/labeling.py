@@ -3,7 +3,7 @@ import numpy as np
 from preprocessing import preprocess
 from preprocessing import augmentation
 
-def writeBlankLabels(outFile='../data/labels.txt', imageDir='../data/cropped', imageExtension='.png'):
+def writeBlankLabels(outFile='../data/train/labels.txt', imageDir='../data/train/cropped', imageExtension='.png'):
     images, names = preprocess.getAllImagesInDirectory(dir=imageDir, imageExtension=imageExtension)
     labels = np.zeros((len(images)), dtype=int)
 
@@ -13,7 +13,7 @@ def writeBlankLabels(outFile='../data/labels.txt', imageDir='../data/cropped', i
 
     f.close()
 
-def getImagesAndLabels(labelsFile='../data/labels.txt', imageDir='../data/cropped', imageExtension='.png'):
+def getImagesAndLabels(labelsFile='../data/train/labels.txt', imageDir='../data/train/cropped', imageExtension='.png'):
     images, names = preprocess.getAllImagesInDirectory(dir=imageDir, imageExtension=imageExtension)
     labels = []
 
@@ -31,7 +31,7 @@ def getImagesAndLabels(labelsFile='../data/labels.txt', imageDir='../data/croppe
 
     return (images, names, np.array(labels))
 
-def getAugmentedDataSet(labelsFile='../data/labels.txt', imageDir='../data/cropped', imageExtension='.png'):
+def getAugmentedDataSet(labelsFile='../data/train/labels.txt', imageDir='../data/train/cropped', imageExtension='.png'):
     images, names, labels = getImagesAndLabels(labelsFile, imageDir, imageExtension)
     noFaceIndices = labels == 0
     noFaceImages = images[noFaceIndices]
