@@ -75,6 +75,37 @@ def getAugmentedDataSet(labelsFile='../data/train/labels.txt', imageDir='../data
 
     return dataset
 
+def getData(labelsFile='../data/test/labels.txt', imageDir='../data/test/cropped', imageExtension='.png'):
+    images, names, labels = getImagesAndLabels(labelsFile, imageDir, imageExtension)
+    noFaceIndices = labels == 0
+    noFaceImages = images[noFaceIndices]
+    noFaceLabels = labels[noFaceIndices]
+
+    faceIndices = labels == 1
+    faceImages = images[faceIndices]
+    faceLabels = labels[faceIndices]
+
+    noFaceImagesDownsampled = []
+    for image in noFaceImages:
+        noFaceImagesDownsampled.append(preprocess.downsample(image, (128, 128)))
+    noFaceImagesDownsampled = np.array(noFaceImagesDownsampled)
+
+    faceImagesDownsampled = []
+    for image in faceImages:
+        faceImagesDownsampled.append(preprocess.downsample(image, (128, 128)))
+    faceImagesDownsampled = np.array(faceImagesDownsampled)
+
+    return (noFaceImagesDownsampled, noFaceLabels, faceImagesDownsampled, faceLabels)
+
+def getDataSet(labelsFile='../data/train/labels.txt', imageDir='../data/train/cropped', imageExtension='.png', oneHot=True):
+    (noFaceImagesDownsampled, noFaceLabels, faceImagesDownsampled, faceLabels) = getData(labelsFile=labelsFile, imageDir=imageDir, imageExtension=imageExtension)
+    images = np.append(noFaceImagesDownsampled, faceImagesDownsampled, axis=0)
+
+    labels = np.append(noFaceLabels, faceLabels, axis=0)
+    dataset = DataSet(images=images, labels=labels, oneHot=oneHot)
+
+    return dataset
+
 
 if __name__ == '__main__':
     print("Nothing to be done here!")
