@@ -23,8 +23,3 @@ def get(attr, root=config):
     for part in attr.split('.'):
         node = node[part]
     return node
-
-def save_model(sess, path):
-    saver = tf.train.Saver()
-    save_path = saver.save(sess, path)
-    print("Model saved to file: " + str(save_path))

@@ -3,6 +3,8 @@ from utils.config import get, save_model
 from data_scripts.fer2013_dataset import read_data_sets
 from model.build_cnn import cnn
 
+from preprocessing.labeling import getAugmentedDataSet, getDataSet
+
 def get_weights(saver, sess):
     ''' load model weights if they were saved previously '''
     if is_file_prefix('TRAIN.CNN.CHECKPOINT'):
@@ -11,7 +13,12 @@ def get_weights(saver, sess):
     else:
         print('OK, I did not find a saved model, so I will start training from scratch!')
 
-def report_training_progress(batch_index, input_layer, loss_func, validationSet, accuracy):
+def save_model(sess, path):
+    saver = tf.train.Saver()
+    save_path = saver.save(sess, path)
+    print("Model saved to file: " + str(save_path))
+
+def report_training_progress(sess, batch_index, input_layer, loss_func, validationSet, accuracy):
     ''' Update user on training progress '''
     if batch_index % 5:
         return
@@ -22,13 +29,17 @@ def report_training_progress(batch_index, input_layer, loss_func, validationSet,
     acc = accuracy.eval(feed_dict={input_layer: validationSet.images, true_labels: validationSet.labels})
     print('\n \t cross_entropy is about %f' % error)
     print(' \t accuracy is about %f' % acc)
+    if batch_index % 500:
+        return
+    print("Saving model...")
+    save_model(sess, get('TRAIN.CNN.CHECKPOINT'))
 
 
-def train_cnn(input_layer, prediction_layer, loss_func, optimizer, trainingSet, validationSet, accuracy):
+def train_cnn(sess, input_layer, prediction_layer, loss_func, optimizer, trainingSet, validationSet, accuracy):
     ''' Train CNN '''
     try:
         for batch_index in range(get('TRAIN.CNN.NB_STEPS')):
-            report_training_progress(
+            report_training_progress(sess,
                 batch_index, input_layer, loss_func, validationSet, accuracy)
             batch_images, batch_labels = trainingSet.next_batch(
                 get('TRAIN.CNN.BATCH_SIZE'))
@@ -39,4 +50,26 @@ def train_cnn(input_layer, prediction_layer, loss_func, optimizer, trainingSet, 
 
 if __name__ == '__main__':
     trainingSet = getAugmentedDataSet(labelsFile='../data/train/labels.txt', imageDir='../data/train/cropped', imageExtension='.png', oneHot=True)
-    
+    validationSet = getDataSet(labelsFile='../data/validation/labels.txt', imageDir='../data/validation/cropped', imageExtension='.png', oneHot=True)
+    testSet = getDataSet(labelsFile='../data/test/labels.txt', imageDir='../data/test/cropped', imageExtension='.png', oneHot=True)
+
+    sess = tf.InteractiveSession()
+    get_weights(saver, sess)
+
+    input_layer, prediction_layer = cnn()
+    true_labels = tf.placeholder(tf.float32, shape=[None, 7])
+    cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(
+                        labels=true_labels, logits=prediction_layer))
+    prediction = tf.argmax(prediction_layer, axis=1)
+    accuracy =  tf.contrib.metrics.accuracy(tf.argmax(true_labels, axis=1), prediction)
+    optimizer = tf.train.AdamOptimizer(
+                    get('TRAIN.CNN.LEARNING_RATE')).minimize(cross_entropy)
+    sess.run(tf.global_variables_initializer())
+
+    print('training...')
+    train_cnn(sess, input_layer, prediction_layer, cross_entropy, optimizer, trainingSet, validationSet, accuracy)
+
+    validation_accuracy = accuracy.eval(feed_dict=
+            {input_layer: faces.validation.images,
+             true_labels: faces.validation.labels})
+    print("My accuracy was: " + str(validation_accuracy))
